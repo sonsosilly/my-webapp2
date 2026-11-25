@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>으스스 생물 뽑기</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,9 +17,10 @@
   --body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   color-scheme: dark;
 }
+*, *::before, *::after { box-sizing: border-box; }
 html, body { height: 100%; }
-body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; overflow: hidden; }
-.app { height: 100%; display: grid; grid-template-rows: auto 1fr auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 1100px; margin: 0 auto; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; overflow: hidden; }
+.app { height: 100%; width: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; grid-template-columns: minmax(0, 1fr); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 1100px; margin: 0 auto; }
 header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-block: 14px 10px; }
 h1 { font-family: var(--display); font-weight: 400; font-size: clamp(22px, 4.5vw, 30px); margin: 0; letter-spacing: .01em; }
 h1 span { color: var(--accent); }
@@ -106,6 +109,7 @@ function show() {
   img.classList.add('out');
   const swap = () => {
     img.onload = () => img.classList.remove('out');
+    img.onerror = () => { $('fact').textContent = `사진 파일(photos/${c.f}.jpg)을 찾지 못했습니다. index.html과 같은 위치에 photos 폴더가 있는지 확인해 주세요.`; };
     img.src = `photos/${c.f}.jpg`; img.alt = `${c.name} 사진`;
     $('name').textContent = c.name; $('sci').textContent = c.sci; $('where').textContent = c.where;
     $('fact').textContent = c.fact;

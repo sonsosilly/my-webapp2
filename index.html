@@ -1,0 +1,121 @@
+<title>으스스 생물 뽑기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: one full-screen specimen at a time, like a lit jar in a dark collection room; the label card sits under the photo. Single dark look by choice. */
+:root {
+  --bg: #0f1210;
+  --panel: #171b18;
+  --ink: #eef1ec;
+  --muted: #9aa39c;
+  --rule: #2b312d;
+  --accent: #b6d94c;
+  --display: "Black Han Sans", "Malgun Gothic", sans-serif;
+  --body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; overflow: hidden; }
+.app { height: 100%; display: grid; grid-template-rows: auto 1fr auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 1100px; margin: 0 auto; }
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-block: 14px 10px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(22px, 4.5vw, 30px); margin: 0; letter-spacing: .01em; }
+h1 span { color: var(--accent); }
+.counter { font-size: 12px; color: var(--muted); letter-spacing: .08em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.stage { position: relative; min-height: 0; display: flex; align-items: center; justify-content: center; border: 0; padding: 0; background: radial-gradient(ellipse at center, #222823 0%, var(--bg) 70%); border-radius: 6px; cursor: pointer; width: 100%; color: inherit; font: inherit; overflow: hidden; }
+.stage:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.stage img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; transition: opacity .25s ease, transform .25s ease; }
+.stage img.out { opacity: 0; transform: scale(.985); }
+.tap { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); background: rgb(15 18 16 / .78); border: 1px solid var(--rule); color: var(--ink); font-size: 13px; padding: 6px 14px; border-radius: 999px; pointer-events: none; white-space: nowrap; }
+.tap b { color: var(--accent); font-weight: 600; }
+
+.label { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; padding-block: 14px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--rule); margin-top: 12px; }
+.name { font-family: var(--display); font-size: clamp(24px, 5vw, 34px); line-height: 1.15; margin: 0; }
+.sci { font-style: italic; color: var(--muted); font-size: 13px; }
+.where { grid-column: 2; grid-row: 1 / span 2; align-self: start; font-size: 12px; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 3px 8px; white-space: nowrap; }
+.fact { grid-column: 1 / -1; margin: 6px 0 0; max-width: 60ch; }
+.credit { grid-column: 1 / -1; font-size: 11.5px; color: var(--muted); margin: 4px 0 0; overflow-wrap: anywhere; }
+.credit a { color: var(--muted); }
+
+@media (max-width: 560px) {
+  .label { grid-template-columns: 1fr; }
+  .where { grid-column: 1; grid-row: auto; justify-self: start; }
+  .fact { font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .stage img { transition: none; } }
+</style>
+
+<div class="app">
+  <header>
+    <h1>으스스 <span>생물</span> 뽑기</h1>
+    <div class="counter" id="counter"></div>
+  </header>
+
+  <button class="stage" id="stage" type="button" aria-label="다음 생물 보기">
+    <img id="photo" alt="">
+    <span class="tap"><b>사진을 누르면</b> 다음 생물</span>
+  </button>
+
+  <section class="label" aria-live="polite">
+    <div>
+      <h2 class="name" id="name"></h2>
+      <div class="sci" id="sci"></div>
+    </div>
+    <div class="where" id="where"></div>
+    <p class="fact" id="fact"></p>
+    <p class="credit" id="credit"></p>
+  </section>
+</div>
+
+<script>
+const creatures = [
+  { f: 'aye-aye', name: '아이아이', sci: 'Daubentonia madagascariensis', where: '마다가스카르', fact: '아주 가늘고 긴 가운뎃손가락으로 나무를 두드린 뒤, 속에 숨은 애벌레를 파내 먹는 여우원숭이입니다.', by: 'nomis-simon', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Wild_aye_aye.jpg' },
+  { f: 'naked-mole-rat', name: '벌거숭이두더지쥐', sci: 'Heterocephalus glaber', where: '동아프리카', fact: '털이 거의 없는 쥐로, 땅속 굴에서 여왕을 중심으로 무리 지어 삽니다. 30년 넘게 살 만큼 오래 삽니다.', by: 'Kein keen', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Webs180130-rat.jpg' },
+  { f: 'goblin-shark', name: '마귀상어', sci: 'Mitsukurina owstoni', where: '전 세계 심해', fact: '먹이를 잡을 때 턱 전체를 앞으로 확 튀어나오게 하는 심해 상어입니다.', by: 'Michigan State University / USFWS', lic: '퍼블릭 도메인', url: 'https://commons.wikimedia.org/wiki/File:Goblin_shark_(Mitsukurina_owstoni).jpg' },
+  { f: 'common-surinam-toad', name: '피파개구리', sci: 'Pipa pipa', where: '남아메리카', fact: '암컷의 등 피부 속에 알이 묻혀 자라고, 다 자란 새끼 개구리가 등의 구멍에서 하나씩 빠져나옵니다.', by: 'Hugo Claessen', lic: 'CC BY-SA 2.5', url: 'https://commons.wikimedia.org/wiki/File:Pipa_pipa01.jpg' },
+  { f: 'solifugae', name: '낙타거미', sci: 'Solifugae', where: '사막 지대', fact: '이름과 달리 거미가 아닌 별도의 무리입니다. 몸에 비해 거대한 집게 같은 턱으로 먹이를 씹어 먹습니다.', by: 'NathanScientific', lic: 'CC0', url: 'https://commons.wikimedia.org/wiki/File:Solifuge_on_white_background,_2026-09-28.jpg' },
+  { f: 'amazon-mata-mata', name: '마타마타거북', sci: 'Chelus fimbriatus', where: '아마존강 유역', fact: '낙엽처럼 생긴 머리로 물속에 숨어 있다가, 입을 크게 벌려 물과 함께 물고기를 빨아들입니다.', by: 'Dick Culbert', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Chelus_fimbriatus_-_Flickr_-_Dick_Culbert.jpg' },
+  { f: 'titan-beetle', name: '타이탄하늘소', sci: 'Titanus giganteus', where: '아마존 열대우림', fact: '몸길이가 16cm를 넘기도 하는, 세계에서 가장 큰 딱정벌레 가운데 하나입니다. 사진은 박물관 표본입니다.', by: 'Didier Descouens', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Titanus_giganteus_MHNT.jpg' },
+  { f: 'sea-lamprey', name: '바다칠성장어', sci: 'Petromyzon marinus', where: '북대서양', fact: '턱이 없고, 이빨이 빽빽한 둥근 빨판 입으로 물고기에 달라붙어 피와 체액을 먹습니다.', by: 'Fernando Losada Rodríguez', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Petromyzon_marinus.001_-_Aquarium_Finisterrae.jpg' },
+  { f: 'goliath-birdeater', name: '골리앗버드이터', sci: 'Theraphosa blondi', where: '남아메리카 북부', fact: '무게로 따지면 세계에서 가장 무거운 거미입니다. 사진은 박물관 표본입니다.', by: 'Didier Descouens', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Theraphosa_blondi_MHNT.jpg' },
+  { f: 'scolopendra-gigantea', name: '아마존왕지네', sci: 'Scolopendra gigantea', where: '남아메리카', fact: '30cm 가까이 자라는 세계 최대급 지네로, 동굴 천장에 매달려 박쥐를 잡아먹기도 합니다.', by: 'Katka Nemčoková', lic: 'CC BY-SA 3.0', url: 'https://commons.wikimedia.org/wiki/File:Scolopendra_gigantea.jpg' },
+  { f: 'amblypygi', name: '채찍거미', sci: 'Amblypygi', where: '열대 지역', fact: '보기와 달리 독이 없습니다. 아주 긴 첫째 다리를 더듬이처럼 휘저어 주변을 살핍니다.', by: 'Graham Wise', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Heterophrynus_02.jpg' },
+  { f: 'japanese-spider-crab', name: '키다리게', sci: 'Macrocheira kaempferi', where: '일본 근해', fact: '다리를 벌리면 폭이 3m를 넘기도 하는, 세계에서 다리가 가장 긴 게입니다.', by: 'Hans Hillewaert', lic: 'CC BY 2.5', url: 'https://commons.wikimedia.org/wiki/File:Macrocheira_kaempferi.jpg' },
+  { f: 'atlantic-wolffish', name: '대서양늑대고기', sci: 'Anarhichas lupus', where: '북대서양', fact: '입 밖으로 튀어나온 송곳니로 성게와 조개 껍데기를 부숴 먹습니다.', by: 'Bjørn Christian Tørrissen', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Anarhichas-lupus-Atlanterhavsparken.jpg' },
+  { f: 'hellbender', name: '헬벤더', sci: 'Cryptobranchus alleganiensis', where: '북아메리카 동부', fact: '북미에서 가장 큰 도롱뇽입니다. 몸 옆의 주름진 피부로 물속 산소를 흡수해 숨을 쉽니다.', by: 'Brian Gratwicke', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Hellbender.jpg' },
+  { f: 'marabou-stork', name: '마라부황새', sci: 'Leptoptilos crumenifer', where: '사하라 이남 아프리카', fact: '털 없는 머리와 목에 늘어진 주머니가 특징이며, 독수리처럼 동물 사체를 먹습니다.', by: 'Charles J. Sharp', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Marabou_stork_(Leptoptilos_crumenifer).jpg' },
+  { f: 'reduviidae', name: '침노린재', sci: 'Rhynocoris iracundus', where: '유럽 등', fact: '뾰족한 주둥이를 먹이에 꽂아 소화액을 넣은 뒤 녹은 속을 빨아 먹습니다. 사진 속 먹이는 꿀벌입니다.', by: 'Charles J. Sharp', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Assassin_bug_(Rhynocoris_iracundus)_with_bee_(Apis_ssp)_prey.jpg' },
+];
+
+const $ = id => document.getElementById(id);
+let bag = [], seen = 0, last = -1;
+function draw() {
+  if (!bag.length) {
+    bag = creatures.map((_, i) => i);
+    for (let i = bag.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [bag[i], bag[j]] = [bag[j], bag[i]]; }
+    if (bag[bag.length - 1] === last && bag.length > 1) [bag[0], bag[bag.length - 1]] = [bag[bag.length - 1], bag[0]];
+  }
+  return bag.pop();
+}
+function preload(i) { const im = new Image(); im.src = `photos/${creatures[i].f}.jpg`; }
+let next = draw();
+function show() {
+  const i = next; last = i; seen++;
+  const c = creatures[i], img = $('photo');
+  img.classList.add('out');
+  const swap = () => {
+    img.onload = () => img.classList.remove('out');
+    img.src = `photos/${c.f}.jpg`; img.alt = `${c.name} 사진`;
+    $('name').textContent = c.name; $('sci').textContent = c.sci; $('where').textContent = c.where;
+    $('fact').textContent = c.fact;
+    $('credit').innerHTML = `사진: ${c.by} · ${c.lic} · <a href="${c.url}" target="_blank" rel="noopener">Wikimedia Commons</a>`;
+    $('counter').textContent = `${seen}번째 · 전체 ${creatures.length}종`;
+  };
+  matchMedia('(prefers-reduced-motion: reduce)').matches ? swap() : setTimeout(swap, 180);
+  next = draw(); preload(next);
+}
+$('stage').addEventListener('click', show);
+document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' && e.target === document.body) show(); });
+show();
+</script>

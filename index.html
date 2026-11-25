@@ -34,7 +34,7 @@ h1 span { color: var(--accent); }
 .tap b { color: var(--accent); font-weight: 600; }
 
 .label { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; padding-block: 14px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--rule); margin-top: 12px; }
-.name { font-family: var(--display); font-size: clamp(24px, 5vw, 34px); line-height: 1.15; margin: 0; }
+.name { font-family: var(--body); font-weight: 600; font-size: clamp(24px, 5vw, 32px); line-height: 1.25; letter-spacing: -.01em; margin: 0; }
 .sci { font-style: italic; color: var(--muted); font-size: 13px; }
 .where { grid-column: 2; grid-row: 1 / span 2; align-self: start; font-size: 12px; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 3px 8px; white-space: nowrap; }
 .fact { grid-column: 1 / -1; margin: 6px 0 0; max-width: 60ch; }
@@ -72,23 +72,38 @@ h1 span { color: var(--accent); }
 </div>
 
 <script>
+const C = 'https://commons.wikimedia.org/wiki/File:';
 const creatures = [
-  { f: 'aye-aye', name: '아이아이', sci: 'Daubentonia madagascariensis', where: '마다가스카르', fact: '아주 가늘고 긴 가운뎃손가락으로 나무를 두드린 뒤, 속에 숨은 애벌레를 파내 먹는 여우원숭이입니다.', by: 'nomis-simon', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Wild_aye_aye.jpg' },
-  { f: 'naked-mole-rat', name: '벌거숭이두더지쥐', sci: 'Heterocephalus glaber', where: '동아프리카', fact: '털이 거의 없는 쥐로, 땅속 굴에서 여왕을 중심으로 무리 지어 삽니다. 30년 넘게 살 만큼 오래 삽니다.', by: 'Kein keen', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Webs180130-rat.jpg' },
-  { f: 'goblin-shark', name: '마귀상어', sci: 'Mitsukurina owstoni', where: '전 세계 심해', fact: '먹이를 잡을 때 턱 전체를 앞으로 확 튀어나오게 하는 심해 상어입니다.', by: 'Michigan State University / USFWS', lic: '퍼블릭 도메인', url: 'https://commons.wikimedia.org/wiki/File:Goblin_shark_(Mitsukurina_owstoni).jpg' },
-  { f: 'common-surinam-toad', name: '피파개구리', sci: 'Pipa pipa', where: '남아메리카', fact: '암컷의 등 피부 속에 알이 묻혀 자라고, 다 자란 새끼 개구리가 등의 구멍에서 하나씩 빠져나옵니다.', by: 'Hugo Claessen', lic: 'CC BY-SA 2.5', url: 'https://commons.wikimedia.org/wiki/File:Pipa_pipa01.jpg' },
-  { f: 'solifugae', name: '낙타거미', sci: 'Solifugae', where: '사막 지대', fact: '이름과 달리 거미가 아닌 별도의 무리입니다. 몸에 비해 거대한 집게 같은 턱으로 먹이를 씹어 먹습니다.', by: 'NathanScientific', lic: 'CC0', url: 'https://commons.wikimedia.org/wiki/File:Solifuge_on_white_background,_2026-09-28.jpg' },
-  { f: 'amazon-mata-mata', name: '마타마타거북', sci: 'Chelus fimbriatus', where: '아마존강 유역', fact: '낙엽처럼 생긴 머리로 물속에 숨어 있다가, 입을 크게 벌려 물과 함께 물고기를 빨아들입니다.', by: 'Dick Culbert', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Chelus_fimbriatus_-_Flickr_-_Dick_Culbert.jpg' },
-  { f: 'titan-beetle', name: '타이탄하늘소', sci: 'Titanus giganteus', where: '아마존 열대우림', fact: '몸길이가 16cm를 넘기도 하는, 세계에서 가장 큰 딱정벌레 가운데 하나입니다. 사진은 박물관 표본입니다.', by: 'Didier Descouens', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Titanus_giganteus_MHNT.jpg' },
-  { f: 'sea-lamprey', name: '바다칠성장어', sci: 'Petromyzon marinus', where: '북대서양', fact: '턱이 없고, 이빨이 빽빽한 둥근 빨판 입으로 물고기에 달라붙어 피와 체액을 먹습니다.', by: 'Fernando Losada Rodríguez', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Petromyzon_marinus.001_-_Aquarium_Finisterrae.jpg' },
-  { f: 'goliath-birdeater', name: '골리앗버드이터', sci: 'Theraphosa blondi', where: '남아메리카 북부', fact: '무게로 따지면 세계에서 가장 무거운 거미입니다. 사진은 박물관 표본입니다.', by: 'Didier Descouens', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Theraphosa_blondi_MHNT.jpg' },
-  { f: 'scolopendra-gigantea', name: '아마존왕지네', sci: 'Scolopendra gigantea', where: '남아메리카', fact: '30cm 가까이 자라는 세계 최대급 지네로, 동굴 천장에 매달려 박쥐를 잡아먹기도 합니다.', by: 'Katka Nemčoková', lic: 'CC BY-SA 3.0', url: 'https://commons.wikimedia.org/wiki/File:Scolopendra_gigantea.jpg' },
-  { f: 'amblypygi', name: '채찍거미', sci: 'Amblypygi', where: '열대 지역', fact: '보기와 달리 독이 없습니다. 아주 긴 첫째 다리를 더듬이처럼 휘저어 주변을 살핍니다.', by: 'Graham Wise', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Heterophrynus_02.jpg' },
-  { f: 'japanese-spider-crab', name: '키다리게', sci: 'Macrocheira kaempferi', where: '일본 근해', fact: '다리를 벌리면 폭이 3m를 넘기도 하는, 세계에서 다리가 가장 긴 게입니다.', by: 'Hans Hillewaert', lic: 'CC BY 2.5', url: 'https://commons.wikimedia.org/wiki/File:Macrocheira_kaempferi.jpg' },
-  { f: 'atlantic-wolffish', name: '대서양늑대고기', sci: 'Anarhichas lupus', where: '북대서양', fact: '입 밖으로 튀어나온 송곳니로 성게와 조개 껍데기를 부숴 먹습니다.', by: 'Bjørn Christian Tørrissen', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Anarhichas-lupus-Atlanterhavsparken.jpg' },
-  { f: 'hellbender', name: '헬벤더', sci: 'Cryptobranchus alleganiensis', where: '북아메리카 동부', fact: '북미에서 가장 큰 도롱뇽입니다. 몸 옆의 주름진 피부로 물속 산소를 흡수해 숨을 쉽니다.', by: 'Brian Gratwicke', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Hellbender.jpg' },
-  { f: 'marabou-stork', name: '마라부황새', sci: 'Leptoptilos crumenifer', where: '사하라 이남 아프리카', fact: '털 없는 머리와 목에 늘어진 주머니가 특징이며, 독수리처럼 동물 사체를 먹습니다.', by: 'Charles J. Sharp', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Marabou_stork_(Leptoptilos_crumenifer).jpg' },
-  { f: 'reduviidae', name: '침노린재', sci: 'Rhynocoris iracundus', where: '유럽 등', fact: '뾰족한 주둥이를 먹이에 꽂아 소화액을 넣은 뒤 녹은 속을 빨아 먹습니다. 사진 속 먹이는 꿀벌입니다.', by: 'Charles J. Sharp', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Assassin_bug_(Rhynocoris_iracundus)_with_bee_(Apis_ssp)_prey.jpg' },
+  { f: 'cymothoa-exigua', name: '혀먹는벌레', sci: 'Cymothoa exigua', where: '동태평양 등', fact: '물고기 입속으로 들어가 혀를 갉아 없앤 뒤, 그 자리에 달라붙어 혀 대신 살아가는 기생 갑각류입니다.', by: 'Marco Vinci', lic: 'CC BY-SA 3.0', url: C + 'Cymothoa_exigua_parassita_Lithognathus_mormyrus.JPG' },
+  { f: 'eunice-aphroditois', name: '보빗웜', sci: 'Eunice aphroditois', where: '인도양 · 태평양', fact: '모래 속에 긴 몸을 숨기고 머리만 내밀고 있다가, 가위 같은 턱으로 지나가는 물고기를 순식간에 낚아챕니다.', by: 'Jenny', lic: 'CC BY 2.0', url: C + 'Eunice_aphroditois.jpg' },
+  { f: 'sea-lamprey', name: '바다칠성장어', sci: 'Petromyzon marinus', where: '북대서양', fact: '턱 없이 이빨이 빽빽한 둥근 빨판 입으로 물고기에 달라붙어 피와 체액을 먹습니다.', by: 'Fernando Losada Rodríguez', lic: 'CC BY-SA 4.0', url: C + 'Petromyzon_marinus.001_-_Aquarium_Finisterrae.jpg' },
+  { f: 'scutigera-coleoptrata', name: '그리마', sci: 'Scutigera coleoptrata', where: '전 세계 집 안', fact: '아주 긴 다리 15쌍으로 집 안을 빠르게 달립니다. 바퀴벌레 같은 해충을 잡아먹습니다. 사진은 박물관 표본입니다.', by: 'Didier Descouens', lic: 'CC BY-SA 4.0', url: C + 'Scutigera_coleoptrata_MHNT_.jpg' },
+  { f: 'scolopendra-gigantea', name: '아마존왕지네', sci: 'Scolopendra gigantea', where: '남아메리카', fact: '30cm 가까이 자라는 세계 최대급 지네로, 동굴 천장에 매달려 박쥐를 잡아먹기도 합니다.', by: 'Katka Nemčoková', lic: 'CC BY-SA 3.0', url: C + 'Scolopendra_gigantea.jpg' },
+  { f: 'naked-mole-rat', name: '벌거숭이두더지쥐', sci: 'Heterocephalus glaber', where: '동아프리카', fact: '털이 거의 없는 쥐로, 땅속 굴에서 여왕을 중심으로 무리 지어 삽니다. 30년 넘게 살 만큼 오래 삽니다.', by: 'Kein keen', lic: 'CC BY-SA 4.0', url: C + 'Webs180130-rat.jpg' },
+  { f: 'aye-aye', name: '아이아이', sci: 'Daubentonia madagascariensis', where: '마다가스카르', fact: '아주 가늘고 긴 가운뎃손가락으로 나무를 두드린 뒤, 속에 숨은 애벌레를 파내 먹는 여우원숭이입니다.', by: 'nomis-simon', lic: 'CC BY 2.0', url: C + 'Wild_aye_aye.jpg' },
+  { f: 'common-surinam-toad', name: '피파개구리', sci: 'Pipa pipa', where: '남아메리카', fact: '암컷의 등 피부 속에 알이 묻혀 자라고, 다 자란 새끼 개구리가 등의 구멍에서 하나씩 빠져나옵니다.', by: 'Hugo Claessen', lic: 'CC BY-SA 2.5', url: C + 'Pipa_pipa01.jpg' },
+  { f: 'hairy-frog', name: '털개구리', sci: 'Trichobatrachus robustus', where: '중앙아프리카', fact: '수컷 옆구리에 털처럼 생긴 피부 돌기가 납니다. 위험할 때 발가락뼈를 부러뜨려 피부 밖으로 내밀어 발톱처럼 쓴다고 알려져 있습니다. 사진은 보존 표본입니다.', by: 'Gustavocarra', lic: 'CC BY-SA 4.0', url: C + 'Trichobatrachus_robustus.JPG' },
+  { f: 'goblin-shark', name: '마귀상어', sci: 'Mitsukurina owstoni', where: '전 세계 심해', fact: '먹이를 잡을 때 턱 전체를 앞으로 확 튀어나오게 하는 심해 상어입니다.', by: 'Michigan State University / USFWS', lic: '퍼블릭 도메인', url: C + 'Goblin_shark_(Mitsukurina_owstoni).jpg' },
+  { f: 'giant-isopod', name: '대왕구족', sci: 'Bathynomus', where: '심해', fact: '쥐며느리의 먼 친척으로, 몸길이가 30cm를 넘기도 합니다. 먹이 없이 몇 년을 버틴 기록이 있습니다. 사진은 박물관 표본입니다.', by: 'Tiouraren (Y.-C. Tsai)', lic: 'CC BY-SA 4.0', url: C + 'Bathynomus_kensleyi_and_Bathynomus_doederleinii_NMMBA.jpg' },
+  { f: 'japanese-spider-crab', name: '키다리게', sci: 'Macrocheira kaempferi', where: '일본 근해', fact: '다리를 벌리면 폭이 3m를 넘기도 하는, 세계에서 다리가 가장 긴 게입니다.', by: 'Hans Hillewaert', lic: 'CC BY 2.5', url: C + 'Macrocheira_kaempferi.jpg' },
+  { f: 'synanceia-verrucosa', name: '스톤피시', sci: 'Synanceia verrucosa', where: '인도양 · 태평양', fact: '바위와 똑같이 생겨 눈에 잘 띄지 않습니다. 등가시의 독은 물고기 가운데 가장 강한 편에 속합니다.', by: 'Karelj', lic: 'CC BY-SA 3.0', url: C + 'Synanceia_verrucosa_Prague_2011_2.jpg' },
+  { f: 'sarcastic-fringehead', name: '사캐스틱 프린지헤드', sci: 'Neoclinus blanchardi', where: '북아메리카 태평양 연안', fact: '영역 다툼을 할 때 입을 머리보다 훨씬 크게 쫙 벌려 상대에게 들이댑니다.', by: 'DarkNight0917', lic: 'CC BY-SA 4.0', url: C + 'Sarcastic_Fringehead_California_ScienCenter.jpg' },
+  { f: 'amazon-mata-mata', name: '마타마타거북', sci: 'Chelus fimbriatus', where: '아마존강 유역', fact: '낙엽처럼 생긴 머리로 물속에 숨어 있다가, 입을 크게 벌려 물과 함께 물고기를 빨아들입니다.', by: 'Dick Culbert', lic: 'CC BY 2.0', url: C + 'Chelus_fimbriatus_-_Flickr_-_Dick_Culbert.jpg' },
+  { f: 'shoebill', name: '넓적부리황새', sci: 'Balaeniceps rex', where: '동아프리카 습지', fact: '구두처럼 거대한 부리를 가진 새입니다. 꼼짝 않고 서 있다가 폐어 같은 큰 물고기를 덮칩니다.', by: 'Bob Owen', lic: 'CC BY 2.0', url: C + 'Balaeniceps_rex_-Ueno_Zoo,_Tokyo,_Japan-8a.jpg' },
+  { f: 'solifugae', name: '낙타거미', sci: 'Solifugae', where: '사막 지대', fact: '이름과 달리 거미가 아닌 별도의 무리입니다. 몸에 비해 거대한 집게 같은 턱으로 먹이를 씹어 먹습니다.', by: 'NathanScientific', lic: 'CC0', url: C + 'Solifuge_on_white_background,_2026-09-28.jpg' },
+  { f: 'amblypygi', name: '채찍거미', sci: 'Amblypygi', where: '열대 지역', fact: '보기와 달리 독이 없습니다. 아주 긴 첫째 다리를 더듬이처럼 휘저어 주변을 살핍니다.', by: 'Graham Wise', lic: 'CC BY 2.0', url: C + 'Heterophrynus_02.jpg' },
+  { f: 'mastigoproctus-giganteus', name: '자이언트 식초전갈', sci: 'Mastigoproctus giganteus', where: '북아메리카 남부', fact: '전갈처럼 생겼지만 독침이 없습니다. 대신 꼬리 끝에서 식초 냄새가 나는 산성 액체를 뿜습니다.', by: 'Jbjensen1', lic: 'CC BY 4.0', url: C + 'Giant_vinegaroon_(Mastigoproctus_giganteus)_face.jpg' },
+  { f: 'emperor-scorpion', name: '황제전갈', sci: 'Pandinus imperator', where: '서아프리카', fact: '몸길이 20cm에 이르는 세계 최대급 전갈입니다. 생김새와 달리 독은 약한 편입니다.', by: 'Rosa Pineda', lic: 'CC BY-SA 3.0', url: C + 'Female_Emperor_Scorpion.jpg' },
+  { f: 'goliath-birdeater', name: '골리앗버드이터', sci: 'Theraphosa blondi', where: '남아메리카 북부', fact: '무게로 따지면 세계에서 가장 무거운 거미입니다. 사진은 박물관 표본입니다.', by: 'Didier Descouens', lic: 'CC BY-SA 4.0', url: C + 'Theraphosa_blondi_MHNT.jpg' },
+  { f: 'phoneutria', name: '브라질떠돌이거미', sci: 'Phoneutria nigriventer', where: '남아메리카', fact: '거미줄을 치지 않고 밤에 돌아다니며 사냥합니다. 세계에서 독이 가장 강한 거미 가운데 하나로 꼽힙니다.', by: 'Rodrigo Tetsuo Argenton', lic: 'CC BY-SA 4.0', url: C + 'Aranha_armadeira(Phoneutria_nigriventer)_por_Rodrigo_Tetsuo_Argenton_(4).jpg' },
+  { f: 'asian-giant-hornet', name: '장수말벌', sci: 'Vespa mandarinia', where: '동아시아 (한국 포함)', fact: '세계에서 가장 큰 말벌입니다. 무리 지어 꿀벌 집을 습격해 몇 시간 만에 꿀벌 수만 마리를 죽이기도 합니다.', by: 'Yasunori Koide', lic: 'CC BY-SA 4.0', url: C + '20200512-P1100071_Vespa_mandarinia_japonica.jpg' },
+  { f: 'tarantula-hawk', name: '타란툴라호크', sci: 'Pepsis', where: '아메리카 대륙', fact: '타란툴라를 침으로 마비시킨 뒤 그 몸에 알을 낳는 대모벌입니다. 쏘였을 때 가장 아픈 곤충 가운데 하나입니다.', by: 'Xpda', lic: 'CC BY-SA 4.0', url: C + 'Tarantula_Hawk,_Southeastern_Colorado_P1270150b.jpg' },
+  { f: 'reduviidae', name: '침노린재', sci: 'Rhynocoris iracundus', where: '유럽 등', fact: '뾰족한 주둥이를 먹이에 꽂아 소화액을 넣은 뒤 녹은 속을 빨아 먹습니다. 사진 속 먹이는 꿀벌입니다.', by: 'Charles J. Sharp', lic: 'CC BY-SA 4.0', url: C + 'Assassin_bug_(Rhynocoris_iracundus)_with_bee_(Apis_ssp)_prey.jpg' },
+  { f: 'arilus', name: '바퀴침노린재', sci: 'Arilus cristatus', where: '북아메리카', fact: '등에 톱니바퀴 모양의 볏이 솟아 있습니다. 주둥이로 다른 곤충을 찔러 체액을 빨아 먹습니다.', by: 'Ryan Kaldari', lic: '퍼블릭 도메인', url: C + 'Arilus_cristatus_Kaldari_02.jpg' },
+  { f: 'lethocerus', name: '물장군', sci: 'Belostomatidae', where: '전 세계 민물', fact: '큰 앞다리로 물고기와 개구리까지 붙잡아 소화액을 넣고 빨아 먹는 대형 수생 곤충입니다.', by: 'Jhou5', lic: 'CC BY-SA 4.0', url: C + 'Belostomatidae_HuntingtonVT_(vertical).jpg' },
+  { f: 'corydalidae', name: '뱀잠자리', sci: 'Corydalus cornutus', where: '북아메리카', fact: '수컷은 엄니처럼 길게 뻗은 큰턱을 가졌습니다. 애벌레는 물속에서 다른 벌레를 잡아먹습니다. 사진은 박물관 표본입니다.', by: 'Didier Descouens', lic: 'CC BY-SA 4.0', url: C + 'Corydalus_cornutus_MHNT.jpg' },
+  { f: 'giant-weta', name: '자이언트 웨타', sci: 'Deinacrida heteracantha', where: '뉴질랜드', fact: '손바닥을 가득 채울 만큼 큰 귀뚜라미 친척으로, 세계에서 가장 무거운 곤충 가운데 하나입니다.', by: 'Dinobass', lic: 'CC BY-SA 4.0', url: C + 'Wetapunga.jpg' },
+  { f: 'mole-cricket', name: '땅강아지', sci: 'Gryllotalpidae', where: '전 세계 (한국 포함)', fact: '삽처럼 생긴 앞다리로 땅굴을 파며 삽니다. 땅속에서 식물 뿌리와 작은 벌레를 먹습니다.', by: 'Wikimedia Commons 기여자', lic: 'GFDL 1.2', url: C + 'Mole_cricket02.jpg' },
 ];
 
 const $ = id => document.getElementById(id);
